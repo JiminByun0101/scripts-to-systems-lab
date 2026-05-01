@@ -1,0 +1,29 @@
+name: Deploy RealSmile
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Build image
+        run: |
+          docker build -t realsmile-backend:${{ github.sha }} ./app
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install realsmile ./realsmile-chart \
+            --namespace realsmile \
+            --set image.tag=${{ github.sha }} \
+            --wait
