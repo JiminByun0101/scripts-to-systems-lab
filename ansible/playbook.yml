@@ -1,0 +1,21 @@
+---
+- name: Configure RealSmile lab environment
+  hosts: local 
+  become: false
+
+  tasks:
+    - name: Create lab namespaces
+      shell: kubectl create namespace {{ item }} --dry-run=client -o yaml | kubectl apply -f -
+      loop: 
+        - realsmile
+        - monitoring
+        - logging
+
+    - name: Verify namespaces exist
+      command: kubectl get namespace {{ item }}
+      loop:
+        - realsmile
+        - monitoring
+        - logging
+      register: ns_check
+      changed_when: false
