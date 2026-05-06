@@ -46,8 +46,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          cd scripts
-          OUTPUT=$(python3 triage.py \
+          OUTPUT=$(PYTHONPATH=scripts python3 triage.py \
             --title "${{ github.event.pull_request.title }}" \
             --body "${{ github.event.pull_request.body }}" \
             --diff "{{ steps.diff.outputs.diff }}")
