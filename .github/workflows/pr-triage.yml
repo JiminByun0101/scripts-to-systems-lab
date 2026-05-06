@@ -1,0 +1,78 @@
+name: PR Triage
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+
+jobs: 
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull_requests: write
+
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up python3
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Get PR diff
+        id: diff
+        run: |
+          BASE=${{ github.event.pull_request.base.sha }}
+          HEAD=${{ github.event.pull_request.head.sha }}
+
+          DIFF=$(git diff $BASE...$HEAD -- . \
+            ':(exclude)*.lock' \
+            ':(exclude)package-lock.json' \
+            | head -c 6000)
+
+          echo "diff<<EOF_DIFF"  >> $GITHUB_OUTPUT
+          echo "$DIFF" >> $GITHUB_OUTPUT
+          echo "EOF_DIFF" >> $GITHUB_OUTPUT
+
+      - name: Run triage
+        id: triage
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          cd scripts
+          OUTPUT=$(python3 triage.py \
+            --title "${{ github.event.pull_request.title }}" \
+            --body "${{ github.event.pull_request.body }}" \
+            --diff "{{ steps.diff.outputs.diff }}")
+
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+
+      - name: Appply labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} \
+            --add-label "${{ steps.triage.outputs.label }},needs-review"
+          
+      - name: Post triage comment
+        env: 
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body \
+            "**Triage summary**
+
+          ${{ steps.triage.outputs.summary }}
+
+          Label applied: \`${{ steps.triage.outputs.label }}\`
+
+          ---
+          *Automated by pr-triage workflow. Review still required.*"
+
+
