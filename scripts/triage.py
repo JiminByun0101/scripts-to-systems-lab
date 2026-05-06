@@ -1,6 +1,9 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
 import argparse
 import json
-import sys
 from llm import call_claude
 
 VALID_LABELS = ("bug", "enhancement", "chore")
