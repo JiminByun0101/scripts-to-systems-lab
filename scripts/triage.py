@@ -31,6 +31,12 @@ def main():
 
   response = call_claude(prompt)
 
+  # strip markdown code block if present
+  response = response.strip() 
+  if response.startswith("```"):
+    response = response.split("\n", 1)[1]
+    response = response.rsplit("```", 1)[0].strip()
+
   try:
     result = json.loads(response)
   except json.JSONDecodeError:
