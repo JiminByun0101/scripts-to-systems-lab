@@ -46,6 +46,7 @@ Bootstrap takes 5–10 minutes on first run. When it finishes, run the port-forw
 | Loki | `logging` | Log aggregation |
 | Alloy | `logging` | Log shipping agent (DaemonSet) |
 | Terraform | — | Grafana resources as code (Part 6) |
+| rollback-controller | `monitoring` | Webhook receiver — rolls back realsmile on `HighPaymentFailureRate` alert |
 
 ---
 
@@ -62,6 +63,9 @@ kubectl port-forward svc/monitoring-grafana 3000:80 -n monitoring &
 
 # Prometheus
 kubectl port-forward svc/monitoring-kube-prometheus-prometheus 9090:9090 -n monitoring &
+
+# Alertmanager
+kubectl port-forward svc/monitoring-kube-prometheus-alertmanager 9093:9093 -n monitoring &
 ```
 
 | Service | URL | Login |
@@ -69,6 +73,7 @@ kubectl port-forward svc/monitoring-kube-prometheus-prometheus 9090:9090 -n moni
 | Grafana | http://localhost:3000 | admin / realsmile-admin |
 | Prometheus | http://localhost:9090 | — |
 | App | http://localhost:8000/health | — |
+| Alertmanager | http://localhost:9093 | — |
 
 ---
  
@@ -93,8 +98,8 @@ To verify logs are flowing, go to **Explore → Loki**, switch to **Code** mode,
 |------|-------|
 | 0 | [Why your scripts are stuck in the backlog](https://jiminbyun.medium.com/from-scripts-to-systems-making-automation-actually-work-in-production-2509d5c4fde5) |
 | 0.5 | [Setting Up the Lab](https://medium.com/@jiminbyun/from-scripts-to-systems-building-the-automation-that-thinks-0-5-0c2482f32cdf) |
-| 1 | PR triage is breaking under volume — coming soon |
-| 2 | Deployments need a human watching Grafana — coming soon |
+| 1 | [PR triage is breaking under volume](https://jiminbyun.medium.com/from-scripts-to-systems-building-the-automation-that-thinks-1-31470a2103c4) |
+| 2 | [Deployments need a human watching Grafana](https://jiminbyun.medium.com/from-scripts-to-systems-building-the-automation-that-thinks-2-c4e01657941e) |
 | 3 | Log patterns are going undetected — coming soon |
 | 4 | On-call starts every incident from scratch — coming soon |
 | 5 | Preview environments are created by hand — coming soon |

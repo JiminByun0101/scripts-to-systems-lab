@@ -44,6 +44,27 @@ helm upgrade --install alloy grafana/alloy \
   -n logging \
   -f monitoring/alloy-values.yaml
 
+# --- Step 7: Alert rules + Alertmanager route ---
+echo "==> Waiting for Prometheus CRDs to be ready..."
+kubectl wait --for condition=established --timeout=60s \
+  crd/prometheusrules.monitoring.coreos.com \
+  crd/alertmanagerconfigs.monitoring.coreos.com
+  
+echo "==> Applying alert rules..."
+kubectl apply -f monitoring/alert-rules.yaml
+
+echo "==> Applying Alertmanager route..."
+kubectl apply -f monitoring/alertmanager-route.yaml
+
+# --- Step 8: Rollback Controller ---
+echo "==> Building rollback-controller image..."
+eval $(minikube docker-env)
+docker build -t rollback-controller:latest ./rollback-controller
+
+echo "==> Deploying rollback-controller..."
+helm upgrade --install rollback-controller ./rollback-controller-chart \
+  -n monitoring
+
 # --- Done ---
 echo ""
 echo "==> Bootstrap complete. Stack is up."
@@ -51,5 +72,6 @@ echo ""
 echo "    App:        kubectl port-forward svc/realsmile-backend 8000:8000 -n realsmile &"
 echo "    Grafana:    kubectl port-forward svc/monitoring-grafana 3000:80 -n monitoring &"
 echo "    Prometheus: kubectl port-forward svc/monitoring-kube-prometheus-prometheus 9090:9090 -n monitoring &"
+echo "    Alertmanager: kubectl port-forward svc/monitoring-kube-prometheus-alertmanager 9093:9093 -n monitoring &"
 echo ""
 echo "    Grafana login: admin / realsmile-admin"
