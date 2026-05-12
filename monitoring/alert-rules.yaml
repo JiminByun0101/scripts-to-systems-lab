@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata: 
+  name: realsmile-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec: 
+  groups:
+    - name: realsmile-payment
+      interval: 30s
+      rules:
+        - alert: HighPaymentFailureRate
+          expr: |
+            increase(realsmile_payment_failures_total[2m]) > 3
+          for: 2m
+          labels:
+            severity: critical
+            app: realsmile-backend
+          annotations:
+            summary: "High payment failure rate detected"

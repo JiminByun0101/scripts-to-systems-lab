@@ -1,0 +1,17 @@
+namespace: monitoring
+
+image:
+  repository: rollback-controller
+  tag: latest
+  pullPolicy: Never
+
+helmRelease: realsmile
+helmNamespace: realsmile
+
+resources:
+  requests:
+    cpu: "50m"
+    memory: "64Mi"
+  limits:
+    cpu: "200m"
+    memory: "128Mi"

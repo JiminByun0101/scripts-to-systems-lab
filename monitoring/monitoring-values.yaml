@@ -29,5 +29,8 @@ prometheus:
             target_label: __address__
 
 alertmanager:
-  enabled: true            
+  enabled: true      
+  alertmanagerSpec:
+    alertmanagerConfigMatcherStrategy:
+      type: None      
 

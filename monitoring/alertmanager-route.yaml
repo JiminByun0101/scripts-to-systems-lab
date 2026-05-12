@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: realsmile-rollback
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  route:
+    receiver: rollback-controller
+    matchers:
+      - name: alertname
+        matchType: "="
+        value: HighPaymentFailureRate
+  receivers:
+    - name: rollback-controller
+      webhookConfigs:
+        - url: "http://rollback-controller.monitoring.svc.cluster.local:8080/webhook"
+          sendResolved: true
