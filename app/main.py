@@ -31,7 +31,7 @@ def health():
 def metrics():
   return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
-@app.get("/payment")
+@app.post("/payment")
 def process_payment():
   start = time.time()
   # Simulate occasional failures - gives Prometheus something real to scrape 
