@@ -99,4 +99,4 @@ To verify logs are flowing, go to **Explore → Loki**, switch to **Code** mode,
 | 4 | On-call starts every incident from scratch — coming soon |
 | 5 | Preview environments are created by hand — coming soon |
 | 6 | Alert rules live in Grafana UI, nowhere else — coming soon |
-| 7 | Making It Production-Ready — coming soon |
+| 7 | Making It Production-Ready — coming soon |# test
